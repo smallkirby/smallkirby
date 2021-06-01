@@ -3,7 +3,7 @@ import os
 
 ydl_opts = {'ignoreerrors': True, 'quiet': True}
 count = 0
-badge_str = "![nirugiri](https://img.shields.io/static/v1?label=nirugiri&message={}&color=orange)\n"
+badge_str = "![nirugiri](https://img.shields.io/static/v1?label=nirugiri&message={}&color=ff69b4)\n"
 
 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
     playlist_dict = ydl.extract_info("https://youtu.be/yvUvamhYPHw", download=False)
