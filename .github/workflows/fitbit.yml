@@ -3,6 +3,7 @@ name: fitbit
 on:
   schedule:
     - cron: '0 1 * * *' # 10:00AM JST
+  workflow_dispatch:
 
 jobs:
   report:
@@ -40,9 +41,9 @@ jobs:
 
           ESCAPED_EARLY_COUNT=$(echo $EARLY_COUNT | sed -e 's/\//\\\//g')
           ESCAPED_EARLY_COUNT=$(echo $ESCAPED_EARLY_COUNT | sed -e 's/ //g')
-          REPLACED_LINE="\![Wakeup Early](https://img.shields.io/badge/Wakeup_Early-$ESCAPED_EARLY_COUNT-blue)"
+          REPLACED_LINE="\![Wakeup Early 2023](https://img.shields.io/badge/Wakeup_Early_2023-$ESCAPED_EARLY_COUNT-blue)"
           sed -i \
-            "s|^\!\[Wakeup Early\].*$|$REPLACED_LINE|g" \
+            "s|^\!\[Wakeup Early 2023\].*$|$REPLACED_LINE|g" \
             README.md
 
           git add ./README.md
