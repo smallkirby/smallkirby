@@ -12,6 +12,13 @@ with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 badge_str = badge_str.format(count)
 print(badge_str)
 if os.path.exists("README.md"):
-    os.remove("README.md")
-with open("README.md", "w+") as f:
-    f.write(badge_str)
+    with open("README.md", "r+") as f:
+        lines = f.readlines()
+        lines[0] = badge_str
+        f.seek(0)
+        f.writelines(lines)
+        f.truncate()
+        f.close()
+else:
+    with open("README.md", "w+") as f:
+        f.write(badge_str)

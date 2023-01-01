@@ -41,6 +41,7 @@ jobs:
           git config --local user.email 'skb+github-actions[bot]@users.noreply.github.com'
 
           ESCAPED_EARLY_COUNT=$(echo $EARLY_COUNT | sed -e 's/\//\\\//g')
+          ESCAPED_EARLY_COUNT=$(echo $ESCAPED_EARLY_COUNT | sed -e 's/ //g')
           REPLACED_LINE="\![Wakeup Early](https://img.shields.io/badge/Wakeup_Early-$ESCAPED_EARLY_COUNT-blue)"
           sed -i \
             "s|^\!\[Wakeup Early\].*$|$REPLACED_LINE|g" \
