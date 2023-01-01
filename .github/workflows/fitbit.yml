@@ -1,8 +1,6 @@
 name: fitbit
 
 on:
-  push:
-    branches: [ master ]
   schedule:
     - cron: '0 1 * * *' # 10:00AM JST
 
