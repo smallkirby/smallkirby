@@ -31,6 +31,7 @@ jobs:
         run: |
           npx ts-node index.ts | tail -n1 > count.tmp
           echo "::set-output name=count::$(cat count.tmp)"
+          rm ./count.tmp
 
       - name: update README
         env:
