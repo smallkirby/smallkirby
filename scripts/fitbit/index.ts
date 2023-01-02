@@ -70,13 +70,12 @@ const main = async () => {
   const token = client.createToken(tokenData);
 
   if (token.expired(EXPIRATION_WINDOW_IN_SECONDS)) {
-    console.log('Token expired, refreshing...');
+    console.info('Token expired, refreshing...');
     const newToken = await token.refresh();
     await admin.firestore().doc('fitbit/tokens').set(newToken.token);
-    console.log('Token refreshed.');
+    console.info('Token refreshed.');
   }
 
-  console.log('Fetching sleep log...');
   const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/2023-01-01/2023-01-31.json`, {
     headers: {
       Authorization: `Bearer ${token.token.access_token}`,
@@ -106,7 +105,7 @@ const main = async () => {
       }
     }
 
-    if (cur.isSame(today, 'day')) {
+    if (cur.isBefore(today, 'day') || cur.isSame(today, 'day')) {
       ++totalDays;
     }
     cur = cur.add(1, 'day');
