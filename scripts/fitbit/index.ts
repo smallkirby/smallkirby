@@ -67,13 +67,15 @@ const main = async () => {
   const tokenData = tokenSnap.data()!;
   tokenData.expires_at = tokenData.expires_at.toDate();
   const userId = tokenData.user_id as string;
-  const token = client.createToken(tokenData);
+  let token = client.createToken(tokenData);
 
   if (token.expired(EXPIRATION_WINDOW_IN_SECONDS)) {
     console.info('Token expired, refreshing...');
     const newToken = await token.refresh();
     await admin.firestore().doc('fitbit/tokens').set(newToken.token);
     console.info('Token refreshed.');
+
+    token = newToken;
   }
 
   const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/2023-01-01/2023-01-31.json`, {
