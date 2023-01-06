@@ -93,6 +93,10 @@ const main = async () => {
   const today = dayjs();
   let cur = dayjs('2023-01-01');
   while (cur.year() === 2023) {
+    if (cur.isBefore(today, 'day') || cur.isSame(today, 'day')) {
+      ++totalDays;
+    }
+
     let todaysLogs = logs
       .filter((l) => l.dateOfSleep.isSame(cur, 'day'))
       .sort((a, b) => a.startTime.diff(b.startTime));
@@ -107,9 +111,6 @@ const main = async () => {
       }
     }
 
-    if (cur.isBefore(today, 'day') || cur.isSame(today, 'day')) {
-      ++totalDays;
-    }
     cur = cur.add(1, 'day');
   }
 
