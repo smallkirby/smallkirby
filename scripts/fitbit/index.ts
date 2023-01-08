@@ -78,7 +78,7 @@ const main = async () => {
     token = newToken;
   }
 
-  const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/2023-01-01/2023-01-31.json`, {
+  const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/2023-01-01/2023-12-31.json`, {
     headers: {
       Authorization: `Bearer ${token.token.access_token}`,
       Accept: 'application/json',
