@@ -78,15 +78,25 @@ const main = async () => {
     token = newToken;
   }
 
-  const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/2023-01-01/2023-12-31.json`, {
-    headers: {
-      Authorization: `Bearer ${token.token.access_token}`,
-      Accept: 'application/json',
-      AcceptLocale: 'ja_JP',
-    },
-  });
+  const ranges = [
+    { from: '2023-01-01', to: '2023-03-31' },
+    { from: '2023-04-01', to: '2023-06-30' },
+    { from: '2023-07-01', to: '2023-09-30' },
+    { from: '2023-10-01', to: '2023-12-31' },
+  ];
+  const sleeps: any[] = [];
+  for (const range of ranges) {
+    const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/${range.from}/${range.to}.json`, {
+      headers: {
+        Authorization: `Bearer ${token.token.access_token}`,
+        Accept: 'application/json',
+        AcceptLocale: 'ja_JP',
+      },
+    });
+    sleeps.push(...sleep.data.sleep);
+  }
 
-  const logs: SleepLog[] = sleep.data.sleep.map(toSleepLog);
+  const logs: SleepLog[] = sleeps.map(toSleepLog);
 
   let totalDays = 0;
   let earlyDaysCount = 0;
