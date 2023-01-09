@@ -29,7 +29,7 @@ jobs:
           FIREBASE_SA_BASE64: ${{ secrets.FIREBASE_SA_BASE64 }}
         run: |
           npx ts-node index.ts > count.tmp
-          echo "::set-output name=count::$(tail -n1 count.tmp)"
+          echo "count=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
           rm ./count.tmp
 
       - name: update README
