@@ -1,2 +1,2 @@
 ![nirugiri](https://img.shields.io/static/v1?label=nirugiri&message=1295148&color=ff69b4)
-![Wakeup Early 2023](https://img.shields.io/badge/Wakeup_Early_2023-8/9-blue)
+![Wakeup Early 2023](https://img.shields.io/badge/Wakeup_Early_2023-9/10-blue)
