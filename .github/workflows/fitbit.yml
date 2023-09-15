@@ -47,5 +47,5 @@ jobs:
             README.md
 
           git add ./README.md
-          git commit -am "fetch fitbit sleep log, update README\n\n[skip ci]"
+          git commit -m "fetch fitbit sleep log, update README" -m "[skip ci]"
           git push
