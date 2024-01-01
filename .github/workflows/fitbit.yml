@@ -42,14 +42,14 @@ jobs:
           git config --local user.name 'GitHub Action'
           git config --local user.email 'skb+github-actions[bot]@users.noreply.github.com'
 
-          ESCAPED_EARLY_COUNT2023=$(echo $EARLY_COUNT2023 | sed -e 's/\//\\\//g')
+          ESCAPED_EARLY_COUNT2023=$(echo $EARLY_COUNT_2023 | sed -e 's/\//\\\//g')
           ESCAPED_EARLY_COUNT2023=$(echo $ESCAPED_EARLY_COUNT2023 | sed -e 's/ //g')
           REPLACED_LINE="\![Wakeup Early 2023](https://img.shields.io/badge/Wakeup_Early_2023-$ESCAPED_EARLY_COUNT2023-blue)"
           sed -i \
             "s|^\!\[Wakeup Early 2023\].*$|$REPLACED_LINE|g" \
             README.md
 
-          ESCAPED_EARLY_COUNT2024=$(echo $EARLY_COUNT2024 | sed -e 's/\//\\\//g')
+          ESCAPED_EARLY_COUNT2024=$(echo $EARLY_COUNT_2024 | sed -e 's/\//\\\//g')
           ESCAPED_EARLY_COUNT2024=$(echo $ESCAPED_EARLY_COUNT2024 | sed -e 's/ //g')
           REPLACED_LINE="\![Wakeup Early 2024](https://img.shields.io/badge/Wakeup_Early_2024-$ESCAPED_EARLY_COUNT2024-blue)"
           sed -i \
