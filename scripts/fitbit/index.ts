@@ -31,6 +31,22 @@ const FIREBASE_SA_B64 = process.env.FIREBASE_SA_BASE64 || '';
 
 const EXPIRATION_WINDOW_IN_SECONDS = 300;
 
+type DateRange = {
+  from: string,
+  to: string,
+};
+const DateRanges: Record<string, DateRange[]> = {
+  '2023': [
+    { from: '2023-01-01', to: '2023-03-31' },
+    { from: '2023-04-01', to: '2023-06-30' },
+    { from: '2023-07-01', to: '2023-09-30' },
+    { from: '2023-10-01', to: '2023-12-31' },
+  ],
+  '2024': [
+    { from: '2024-01-01', to: '2024-03-31' },
+  ]
+}
+
 if (!CLIENT_ID || !CLIENT_SECRET || !FIREBASE_SA_B64) {
   throw new Error('CLIENT_ID or CLIENT_SECRET or FIREBASE_SA_BASE64 is not defined');
 }
@@ -56,6 +72,18 @@ const client = new AuthorizationCode({
 });
 
 const main = async () => {
+  // get argc
+  if (process.argv.length !== 3) {
+    console.error('Usage: node index.js <year>');
+    process.exit(1);
+  }
+  const year = process.argv[2];
+  const ranges = DateRanges[year];
+  if (!ranges) {
+    console.error('Invalid year');
+    process.exit(1);
+  }
+
   // Restore saved tokens
   const tokenSnap = await admin.firestore().doc('fitbit/tokens').get();
   if (!tokenSnap.exists) {
@@ -78,12 +106,6 @@ const main = async () => {
     token = newToken;
   }
 
-  const ranges = [
-    { from: '2023-01-01', to: '2023-03-31' },
-    { from: '2023-04-01', to: '2023-06-30' },
-    { from: '2023-07-01', to: '2023-09-30' },
-    { from: '2023-10-01', to: '2023-12-31' },
-  ];
   const sleeps: any[] = [];
   for (const range of ranges) {
     const sleep = await axios.get(`https://api.fitbit.com/1.2/user/${userId}/sleep/date/${range.from}/${range.to}.json`, {
@@ -101,8 +123,8 @@ const main = async () => {
   let totalDays = 0;
   let earlyDaysCount = 0;
   const today = dayjs();
-  let cur = dayjs('2023-01-01');
-  while (cur.year() === 2023) {
+  let cur = dayjs(`${year}-01-01`);
+  while (cur.year().toString() === year) {
     if (cur.isBefore(today, 'day') || cur.isSame(today, 'day')) {
       ++totalDays;
     }
