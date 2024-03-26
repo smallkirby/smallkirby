@@ -138,7 +138,7 @@ const main = async () => {
         log = todaysLogs[todaysLogs.length - 1];
       }
 
-      if (log.endTime.hour() < 9) {
+      if (log.endTime.hour() < Number(process.env.EARLY_THRESHOLD_HOUR!)) {
         ++earlyDaysCount;
       }
     }
