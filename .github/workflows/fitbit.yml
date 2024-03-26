@@ -27,6 +27,7 @@ jobs:
           CLIENT_ID: ${{ secrets.FITBIT_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.FITBIT_CLIENT_SECRET }}
           FIREBASE_SA_BASE64: ${{ secrets.FIREBASE_SA_BASE64 }}
+          EARLY_THRESHOLD_HOUR: ${{ secrets.EARLY_THRESHOLD_HOUR }}
         run: |
           npx ts-node index.ts 2023 > count.tmp
           echo "count2023=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
