@@ -34,11 +34,14 @@ jobs:
           rm ./count.tmp
           npx ts-node index.ts 2024 > count.tmp
           echo "count2024=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
+          npx ts-node index.ts 2025 > count.tmp
+          echo "count2025=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
 
       - name: update README
         env:
           EARLY_COUNT_2023: ${{ steps.early_counts.outputs.count2023 }}
           EARLY_COUNT_2024: ${{ steps.early_counts.outputs.count2024 }}
+          EARLY_COUNT_2025: ${{ steps.early_counts.outputs.count2025 }}
         run: |
           git config --local user.name 'GitHub Action'
           git config --local user.email 'skb+github-actions[bot]@users.noreply.github.com'
@@ -55,6 +58,13 @@ jobs:
           REPLACED_LINE="\![Wakeup Early 2024](https://img.shields.io/badge/Wakeup_Early_2024-$ESCAPED_EARLY_COUNT2024-blue)"
           sed -i \
             "s|^\!\[Wakeup Early 2024\].*$|$REPLACED_LINE|g" \
+            README.md
+
+          ESCAPED_EARLY_COUNT2025=$(echo $EARLY_COUNT_2025 | sed -e 's/\//\\\//g')
+          ESCAPED_EARLY_COUNT2025=$(echo $ESCAPED_EARLY_COUNT2025 | sed -e 's/ //g')
+          REPLACED_LINE="\![Wakeup Early 2025](https://img.shields.io/badge/Wakeup_Early_2025-$ESCAPED_EARLY_COUNT2025-blue)"
+          sed -i \
+            "s|^\!\[Wakeup Early 2025\].*$|$REPLACED_LINE|g" \
             README.md
 
           git add ./README.md
