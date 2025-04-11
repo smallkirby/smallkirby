@@ -1,12 +1,19 @@
 {
-  "dependencies": {
-    "@types/simple-oauth2": "^5.0.7",
-    "axios": "^1.8.4",
-    "dayjs": "^1.11.13",
-    "dotenv": "^16.5.0",
-    "firebase-admin": "^13.2.0",
-    "simple-oauth2": "^5.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  }
+	"scripts": {
+		"fmt": "biome check .",
+		"fmt:fix": "biome check . --write"
+	},
+	"dependencies": {
+		"@types/simple-oauth2": "^5.0.7",
+		"axios": "^1.8.4",
+		"dayjs": "^1.11.13",
+		"dotenv": "^16.5.0",
+		"firebase-admin": "^13.2.0",
+		"simple-oauth2": "^5.1.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4"
+	}
 }
