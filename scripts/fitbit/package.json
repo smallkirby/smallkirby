@@ -1,4 +1,5 @@
 {
+	"type": "module",
 	"scripts": {
 		"fmt": "biome check .",
 		"fmt:fix": "biome check . --write"
@@ -6,14 +7,19 @@
 	"dependencies": {
 		"@types/simple-oauth2": "^5.0.7",
 		"axios": "^1.8.4",
+		"cal-heatmap": "^4.2.4",
 		"dayjs": "^1.11.13",
 		"dotenv": "^16.5.0",
 		"firebase-admin": "^13.2.0",
+		"jsdom": "^26.0.0",
 		"simple-oauth2": "^5.1.0",
 		"ts-node": "^10.9.2",
+		"tsx": "^4.19.3",
 		"typescript": "^5.8.3"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4"
+		"@biomejs/biome": "^1.9.4",
+		"@types/cal-heatmap": "^4.0.0",
+		"@types/jsdom": "^21.1.7"
 	}
 }

@@ -15,7 +15,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dependencies
         working-directory: ./scripts/fitbit
@@ -29,45 +28,15 @@ jobs:
           CLIENT_SECRET: ${{ secrets.FITBIT_CLIENT_SECRET }}
           FIREBASE_SA_BASE64: ${{ secrets.FIREBASE_SA_BASE64 }}
           EARLY_THRESHOLD_HOUR: ${{ secrets.EARLY_THRESHOLD_HOUR }}
-        run: |
-          npx ts-node index.ts 2023 > count.tmp
-          echo "count2023=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
-          rm ./count.tmp
-          npx ts-node index.ts 2024 > count.tmp
-          echo "count2024=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
-          npx ts-node index.ts 2025 > count.tmp
-          echo "count2025=$(tail -n1 count.tmp)" >> $GITHUB_OUTPUT
-
-      - name: update README
-        env:
-          EARLY_COUNT_2023: ${{ steps.early_counts.outputs.count2023 }}
-          EARLY_COUNT_2024: ${{ steps.early_counts.outputs.count2024 }}
-          EARLY_COUNT_2025: ${{ steps.early_counts.outputs.count2025 }}
+          IS_CI: true
         run: |
           git config --local user.name 'GitHub Action'
           git config --local user.email 'skb+github-actions[bot]@users.noreply.github.com'
 
-          ESCAPED_EARLY_COUNT2023=$(echo $EARLY_COUNT_2023 | sed -e 's/\//\\\//g')
-          ESCAPED_EARLY_COUNT2023=$(echo $ESCAPED_EARLY_COUNT2023 | sed -e 's/ //g')
-          REPLACED_LINE="\![Wakeup Early 2023](https://img.shields.io/badge/Wakeup_Early_2023-$ESCAPED_EARLY_COUNT2023-blue)"
-          sed -i \
-            "s|^\!\[Wakeup Early 2023\].*$|$REPLACED_LINE|g" \
-            README.md
+          npx ts-node index.ts 2023
+          npx ts-node index.ts 2024
+          npx ts-node index.ts 2025
 
-          ESCAPED_EARLY_COUNT2024=$(echo $EARLY_COUNT_2024 | sed -e 's/\//\\\//g')
-          ESCAPED_EARLY_COUNT2024=$(echo $ESCAPED_EARLY_COUNT2024 | sed -e 's/ //g')
-          REPLACED_LINE="\![Wakeup Early 2024](https://img.shields.io/badge/Wakeup_Early_2024-$ESCAPED_EARLY_COUNT2024-blue)"
-          sed -i \
-            "s|^\!\[Wakeup Early 2024\].*$|$REPLACED_LINE|g" \
-            README.md
-
-          ESCAPED_EARLY_COUNT2025=$(echo $EARLY_COUNT_2025 | sed -e 's/\//\\\//g')
-          ESCAPED_EARLY_COUNT2025=$(echo $ESCAPED_EARLY_COUNT2025 | sed -e 's/ //g')
-          REPLACED_LINE="\![Wakeup Early 2025](https://img.shields.io/badge/Wakeup_Early_2025-$ESCAPED_EARLY_COUNT2025-blue)"
-          sed -i \
-            "s|^\!\[Wakeup Early 2025\].*$|$REPLACED_LINE|g" \
-            README.md
-
-          git add ./README.md
-          git commit -m "fetch fitbit sleep log, update README" -m "[skip ci]"
+          git add ./scripts/fitbit/img
+          git commit -m "ci: update fitbit data" -m "[skip ci]"
           git push
