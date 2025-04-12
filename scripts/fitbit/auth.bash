@@ -26,7 +26,7 @@ VERIFIER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 100 | head -n 1)
 CHALLENGE=$(echo -n $VERIFIER | openssl dgst -sha256 -binary | openssl base64 | tr -d '=' | tr '/+' '_-')
 
 xdg-open \
-"https://www.fitbit.com/oauth2/authorize?client_id=$CLIENT_ID&response_type=code&code_challenge=$CHALLENGE&code_challenge_method=S256&scope=sleep+activity" \
+"https://www.fitbit.com/oauth2/authorize?client_id=$CLIENT_ID&response_type=code&code_challenge=$CHALLENGE&code_challenge_method=S256&scope=sleep+activity+heartrate" \
 > /dev/null 2>&1
 
 echo -en "${C_GREEN}[+]${C_RST} Waiting for code > "

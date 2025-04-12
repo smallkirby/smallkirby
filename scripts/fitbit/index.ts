@@ -20,6 +20,16 @@ type SleepLog = {
 	efficiency: number;
 };
 
+type ActivityLog = {
+	dateTime: string;
+	value: {
+		fatBurnActiveZoneMinutes: number;
+		cardioActiveZoneMinutes: number;
+		peakActiveZoneMinutes: number;
+		activeZoneMinutes: number;
+	};
+};
+
 type HeatmapData = {
 	date: string;
 	value: number;
@@ -35,6 +45,17 @@ const toSleepLog = (obj: any): SleepLog => ({
 	efficiency: obj.efficiency,
 });
 
+// biome-ignore lint/suspicious/noExplicitAny: expected
+const toActivityLog = (obj: any): ActivityLog => ({
+	dateTime: obj.dateTime,
+	value: {
+		fatBurnActiveZoneMinutes: obj.value.fatBurnActiveZoneMinutes,
+		cardioActiveZoneMinutes: obj.value.cardioActiveZoneMinutes,
+		peakActiveZoneMinutes: obj.value.peakActiveZoneMinutes,
+		activeZoneMinutes: obj.value.activeZoneMinutes,
+	},
+});
+
 dotenv.config();
 dayjs.locale("jp");
 
@@ -43,7 +64,7 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const FIREBASE_SA_B64 = process.env.FIREBASE_SA_BASE64 || "";
 
 const EXPIRATION_WINDOW_IN_SECONDS = 300;
-const FITBIT_SCOPE = "sleep+activity";
+const FITBIT_SCOPE = "sleep+activity+heartrate";
 
 type DateRange = {
 	from: string;
@@ -70,7 +91,7 @@ const DateRanges: Record<string, DateRange[]> = {
 	],
 };
 
-type HeatmapKind = "sleep";
+type HeatmapKind = "sleep" | "activity";
 
 if (!CLIENT_ID || !CLIENT_SECRET || !FIREBASE_SA_B64) {
 	throw new Error(
@@ -105,62 +126,61 @@ const calcSleepScore = (base: Dayjs, actual: Dayjs, max: number): number => {
 	return ((ratio + 1) / 2) * max; // [0, max]
 };
 
+const calcActivityScore = (
+	base: number,
+	actual: number,
+	max: number,
+): number => {
+	const value = Math.max(0, Math.min(base, actual)); // [0, base]
+	return (value / base) * max; // [0, max]
+};
+
 const generateHaetmapName = (kind: HeatmapKind, year: string): string =>
 	`img/${kind}-${year}.svg`;
 
 const fetchToken = async (): Promise<AccessToken> => {
-	if (process.env.IS_CI === "true") {
-		// Restore saved tokens
-		const tokenSnap = await admin.firestore().doc("fitbit/tokens").get();
-		if (!tokenSnap.exists) {
-			console.error("No tokens found in Firestore");
-			process.exit(1);
-		}
-
-		// Check expiration
-		const tokenData = tokenSnap.data();
-		if (!tokenData) {
-			throw new Error("Token data is null");
-		}
-		tokenData.expires_at = tokenData.expires_at.toDate();
-		let token = client.createToken(tokenData);
-
-		if (token.expired(EXPIRATION_WINDOW_IN_SECONDS)) {
-			console.info("Token expired, refreshing...");
-			const newToken = await token.refresh();
-			await admin.firestore().doc("fitbit/tokens").set(newToken.token);
-			console.info("Token refreshed.");
-
-			token = newToken;
-		}
-
-		return token;
+	// Restore s/ve tokens
+	const docName =
+		process.env.IS_CI === "true" ? "fitbit/tokens-dev" : "fitbit/tokens";
+	const tokenSnap = await admin.firestore().doc(docName).get();
+	if (!tokenSnap.exists) {
+		console.error("No tokens found in Firestore");
+		process.exit(1);
 	}
 
-	if (
-		!process.env.ACCESS_TOKEN ||
-		!process.env.REFRESH_TOKEN ||
-		!process.env.USER_ID
-	) {
-		throw new Error("ACCESS_TOKEN or REFRESH_TOKEN is not defined");
+	// Check expiration
+	const tokenData = tokenSnap.data();
+	if (!tokenData) {
+		throw new Error("Token data is null");
+	}
+	tokenData.expires_at = tokenData.expires_at.toDate();
+	let token = client.createToken(tokenData);
+
+	if (token.expired(EXPIRATION_WINDOW_IN_SECONDS)) {
+		console.info("Token expired, refreshing...");
+		const newToken = await token.refresh();
+		await admin.firestore().doc(docName).set(newToken.token);
+		console.info("Token refreshed.");
+
+		token = newToken;
 	}
 
-	return client.createToken({
-		access_token: process.env.ACCESS_TOKEN,
-		refresh_token: process.env.REFRESH_TOKEN,
-		scope: FITBIT_SCOPE,
-		token_type: "Bearer",
-		user_id: process.env.USER_ID,
-	});
+	return token;
 };
 
 const main = async () => {
 	// Get argc
-	if (process.argv.length !== 3) {
-		console.error("Usage: node index.js <year>");
+	if (process.argv.length !== 4) {
+		console.error("Usage: node index.js <kind> <year>");
 		process.exit(1);
 	}
-	const year = process.argv[2];
+	const kind = process.argv[2] as HeatmapKind;
+	if (kind !== "sleep" && kind !== "activity") {
+		console.error("Invalid kind");
+		process.exit(1);
+	}
+
+	const year = process.argv[3];
 	const ranges = DateRanges[year];
 	if (!ranges) {
 		console.error("Invalid year");
@@ -170,13 +190,23 @@ const main = async () => {
 	// Fetch or refresh token.
 	const token = await fetchToken();
 
-	// Generate sleep heatmap.
-	await generateSleepHeatmap(
-		token,
-		year,
-		ranges,
-		generateHaetmapName("sleep", year),
-	);
+	if (kind === "sleep") {
+		// Generate sleep heatmap.
+		await generateSleepHeatmap(
+			token,
+			year,
+			ranges,
+			generateHaetmapName("sleep", year),
+		);
+	} else if (kind === "activity") {
+		// Generate activity heatmap.
+		await generateActivityHeatmap(
+			token,
+			year,
+			ranges,
+			generateHaetmapName("activity", year),
+		);
+	}
 };
 
 const fetchSleepData = async (
@@ -236,6 +266,51 @@ const fetchSleepData = async (
 	return sleepHeatmapData;
 };
 
+const fetchActivityData = async (
+	token: AccessToken,
+	year: string,
+	ranges: DateRange[],
+): Promise<HeatmapData[]> => {
+	if (process.env.ACTIVITY_JSON) {
+		const json = fs.readFileSync(process.env.ACTIVITY_JSON, "utf-8");
+		return JSON.parse(json);
+	}
+
+	const userId = token.token.user_id as string;
+
+	const activity = await axios.get(
+		`https://api.fitbit.com/1/user/${userId}/activities/active-zone-minutes/date/${year}-01-01/${year}-12-31.json`,
+		{
+			headers: {
+				Authorization: `Bearer ${token.token.access_token}`,
+				Accept: "application/json",
+				AcceptLocale: "ja_JP",
+			},
+		},
+	);
+	const rawEntries = activity.data["activities-active-zone-minutes"];
+
+	const activities: ActivityLog[] = rawEntries.map(toActivityLog);
+	let cur = dayjs(`${year}-01-01`);
+	const activityHeatmapData: HeatmapData[] = [];
+	while (cur.year().toString() === year) {
+		const todaysLogs = activities
+			.filter((l) => dayjs(l.dateTime).isSame(cur, "day"))
+			.sort((a, b) => dayjs(a.dateTime).diff(b.dateTime));
+		if (todaysLogs.length !== 0) {
+			const log = todaysLogs[0];
+			activityHeatmapData.push({
+				date: cur.format("YYYY-MM-DD"),
+				value: calcActivityScore(120, log.value.activeZoneMinutes, 100),
+			});
+		}
+
+		cur = cur.add(1, "day");
+	}
+
+	return activityHeatmapData;
+};
+
 const generateSleepHeatmap = async (
 	token: AccessToken,
 	year: string,
@@ -244,6 +319,16 @@ const generateSleepHeatmap = async (
 ) => {
 	const sleepHeatmapData = await fetchSleepData(token, year, ranges);
 	await generateHeatmap(sleepHeatmapData, year, filename);
+};
+
+const generateActivityHeatmap = async (
+	token: AccessToken,
+	year: string,
+	ranges: DateRange[],
+	filename: string,
+) => {
+	const activityHeatmapData = await fetchActivityData(token, year, ranges);
+	await generateHeatmap(activityHeatmapData, year, filename);
 };
 
 const generateHeatmap = async (
@@ -256,27 +341,25 @@ const generateHeatmap = async (
 	const document = jsdom.window.document;
 
 	const ch = new CalHeatmap();
-	await ch.paint(
-		{
-			data: {
-				source: data,
-				x: "date",
-				y: (d) => d.value,
-				defaultValue: 0,
-			},
-			date: {
-				start: new Date(`${year}-01-01`),
-			},
-			range: 1,
-			scale: { color: { type: "linear", scheme: "Oranges", domain: [0, 100] } },
-			domain: {
-				type: "year",
-			},
-			subDomain: { type: "day", radius: 2 },
-			itemSelector: document.getElementById(heatmap_id),
-			theme: "dark",
+	await ch.paint({
+		data: {
+			source: data,
+			x: "date",
+			y: (d) => d.value,
+			defaultValue: 0,
 		},
-	);
+		date: {
+			start: new Date(`${year}-01-01`),
+		},
+		range: 1,
+		scale: { color: { type: "linear", scheme: "Oranges", domain: [0, 100] } },
+		domain: {
+			type: "year",
+		},
+		subDomain: { type: "day", radius: 2 },
+		itemSelector: document.getElementById(heatmap_id),
+		theme: "dark",
+	});
 
 	fs.writeFileSync(
 		filename,

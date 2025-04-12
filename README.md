@@ -13,3 +13,9 @@
 ### 2023
 
 ![sleep-2023](./scripts/fitbit/img/sleep-2023.png)
+
+## 🏃‍♀️🏊‍♀️ Exercise Score 🏊🏃
+
+### 2025
+
+![activity-2025](./scripts/fitbit/img/activity-2025.png)
