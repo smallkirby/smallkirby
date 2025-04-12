@@ -36,9 +36,9 @@ jobs:
           git config --local user.name 'GitHub Action'
           git config --local user.email 'skb+github-actions[bot]@users.noreply.github.com'
 
-          npx ts-node index.ts 2023
-          npx ts-node index.ts 2024
-          npx ts-node index.ts 2025
+          npx tsx index.ts 2023
+          npx tsx index.ts 2024
+          npx tsx index.ts 2025
 
           convert ./img/sleep-2023.svg ./img/sleep-2023.png
           convert ./img/sleep-2024.svg ./img/sleep-2024.png
