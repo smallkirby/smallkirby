@@ -16,6 +16,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install Ubuntu dependencies
+        run: sudo apt-get install -y imagemagick librsvg2-bin
+
       - name: Install dependencies
         working-directory: ./scripts/fitbit
         run: npm ci --prefer-offline --no-audit
@@ -36,6 +39,10 @@ jobs:
           npx ts-node index.ts 2023
           npx ts-node index.ts 2024
           npx ts-node index.ts 2025
+
+          convert ./img/sleep-2023.svg ./img/sleep-2023.png
+          convert ./img/sleep-2024.svg ./img/sleep-2024.png
+          convert ./img/sleep-2025.svg ./img/sleep-2025.png
 
           git add ./scripts/fitbit/img
           git commit -m "ci: update fitbit data" -m "[skip ci]"

@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import axios from "axios";
 import CalHeatmap from "cal-heatmap";
-import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 import dayjs, { locale, type Dayjs } from "dayjs";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
@@ -277,21 +276,6 @@ const generateHeatmap = async (
 			itemSelector: document.getElementById(heatmap_id),
 			theme: "dark",
 		},
-		[
-			[
-				CalendarLabel,
-				{
-					enabled: true,
-					position: "left",
-					width: 30,
-					textAlign: "start",
-					text: () =>
-						["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) =>
-							i % 2 === 0 ? "" : d,
-						),
-				},
-			],
-		],
 	);
 
 	fs.writeFileSync(
