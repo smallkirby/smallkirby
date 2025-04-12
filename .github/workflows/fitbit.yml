@@ -44,6 +44,6 @@ jobs:
           convert ./img/sleep-2024.svg ./img/sleep-2024.png
           convert ./img/sleep-2025.svg ./img/sleep-2025.png
 
-          git add ./scripts/fitbit/img
+          git add ./img
           git commit -m "ci: update fitbit data" -m "[skip ci]"
           git push
