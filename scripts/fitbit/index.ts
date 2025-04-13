@@ -141,7 +141,7 @@ const generateHaetmapName = (kind: HeatmapKind, year: string): string =>
 const fetchToken = async (): Promise<AccessToken> => {
 	// Restore s/ve tokens
 	const docName =
-		process.env.IS_CI === "true" ? "fitbit/tokens-dev" : "fitbit/tokens";
+		process.env.IS_CI === "true" ? "fitbit/tokens" : "fitbit/tokens-dev";
 	const tokenSnap = await admin.firestore().doc(docName).get();
 	if (!tokenSnap.exists) {
 		console.error("No tokens found in Firestore");
