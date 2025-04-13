@@ -1,5 +1,3 @@
-# smallkirby
-
 ## 🌛🌞 Wake-Up Early Score 🌞🌛
 
 ### 2025
