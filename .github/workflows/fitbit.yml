@@ -2,7 +2,7 @@ name: fitbit
 
 on:
   schedule:
-    - cron: '0 1 * * *' # 10:00AM JST
+    - cron: "0 1 * * *" # 10:00AM JST
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,9 @@ jobs:
           node-version: 20
 
       - name: Install Ubuntu dependencies
-        run: sudo apt-get install -y imagemagick librsvg2-bin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick librsvg2-bin
 
       - name: Install dependencies
         working-directory: ./scripts/fitbit
