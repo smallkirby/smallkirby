@@ -89,6 +89,12 @@ const DateRanges: Record<string, DateRange[]> = {
 		{ from: "2025-07-01", to: "2025-09-30" },
 		{ from: "2025-10-01", to: "2025-12-31" },
 	],
+	"2026": [
+		{ from: "2026-01-01", to: "2026-03-31" },
+		{ from: "2026-04-01", to: "2026-06-30" },
+		{ from: "2026-07-01", to: "2026-09-30" },
+		{ from: "2026-10-01", to: "2026-12-31" },
+	],
 };
 
 type HeatmapKind = "sleep" | "activity";

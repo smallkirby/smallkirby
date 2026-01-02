@@ -41,12 +41,16 @@ jobs:
           npx tsx index.ts sleep 2023
           npx tsx index.ts sleep 2024
           npx tsx index.ts sleep 2025
+          npx tsx index.ts sleep 2026
           convert ./img/sleep-2023.svg ./img/sleep-2023.png
           convert ./img/sleep-2024.svg ./img/sleep-2024.png
           convert ./img/sleep-2025.svg ./img/sleep-2025.png
+          convert ./img/sleep-2026.svg ./img/sleep-2026.png
 
           npx tsx index.ts activity 2025
+          npx tsx index.ts activity 2026
           convert ./img/activity-2025.svg ./img/activity-2025.png
+          convert ./img/activity-2026.svg ./img/activity-2026.png
 
           git add ./img
           git commit -m "ci: update fitbit data" -m "[skip ci]"
